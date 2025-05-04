@@ -1,51 +1,56 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { FaFingerprint } from 'react-icons/fa';
 import { glassmorphismStyles } from '../styles/theme';
+import { useUser } from '../context/UserContext';
 import { supabase } from '../lib/supabase';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
-  const [loading, setLoading] = useState(false);
+  const { signUp, isLoading } = useUser();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!');
+      toast.error('Passwords do not match');
       return;
     }
-
-    setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
+      await signUp({
         email: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            full_name: formData.name,
-          },
-        },
+        fullName: formData.fullName,
       });
-
-      if (error) throw error;
-
-      toast.success('Registration successful! Please check your email for verification.');
-      navigate('/');
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setLoading(false);
     }
+  };
+
+  const handleBiometricRegister = async () => {
+    return navigate('/biometric-register');
+    // try {
+    //   const { data, error } = await supabase.auth.signInWithOAuth({
+    //     provider: 'google',
+    //     options: {
+    //       redirectTo: `${window.location.origin}/dashboard`,
+    //     },
+    //   });
+
+    //   if (error) throw error;
+    // } catch (error: any) {
+    //   toast.error(error.message);
+    // }
   };
 
   return (
@@ -66,13 +71,13 @@ const Register = () => {
       }}>
         <input
           type="text"
-          name="name"
+          name="fullName"
           placeholder="Full Name"
-          value={formData.name}
+          value={formData.fullName}
           onChange={handleChange}
           style={glassmorphismStyles.input}
           required
-          disabled={loading}
+          disabled={isLoading}
         />
         <input
           type="email"
@@ -82,7 +87,7 @@ const Register = () => {
           onChange={handleChange}
           style={glassmorphismStyles.input}
           required
-          disabled={loading}
+          disabled={isLoading}
         />
         <input
           type="password"
@@ -92,7 +97,7 @@ const Register = () => {
           onChange={handleChange}
           style={glassmorphismStyles.input}
           required
-          disabled={loading}
+          disabled={isLoading}
         />
         <input
           type="password"
@@ -102,17 +107,33 @@ const Register = () => {
           onChange={handleChange}
           style={glassmorphismStyles.input}
           required
-          disabled={loading}
+          disabled={isLoading}
         />
         <button 
           type="submit" 
           style={{
             ...glassmorphismStyles.button,
-            opacity: loading ? 0.7 : 1,
+            opacity: isLoading ? 0.7 : 1,
           }}
-          disabled={loading}
+          disabled={isLoading}
         >
-          {loading ? 'Registering...' : 'Register'}
+          {isLoading ? 'Registering...' : 'Register'}
+        </button>
+        <button
+          type="button"
+          onClick={handleBiometricRegister}
+          style={{
+            ...glassmorphismStyles.button,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+            opacity: isLoading ? 0.7 : 1,
+          }}
+          disabled={isLoading}
+        >
+          <FaFingerprint /> Register with Biometrics
         </button>
       </form>
       <p style={{ 
@@ -122,7 +143,7 @@ const Register = () => {
         fontSize: 'clamp(0.9rem, 2vw, 1rem)',
       }}>
         Already have an account?{' '}
-        <Link to="/" style={{ color: '#fff', textDecoration: 'underline' }}>
+        <Link to="/login" style={{ color: '#fff', textDecoration: 'underline' }}>
           Login
         </Link>
       </p>

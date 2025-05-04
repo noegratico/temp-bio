@@ -3,31 +3,28 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaFingerprint } from 'react-icons/fa';
 import { glassmorphismStyles } from '../styles/theme';
+import { useUser } from '../context/UserContext';
 import { supabase } from '../lib/supabase';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const { signIn, isLoading } = useUser();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-      if (error) throw error;
-      
-      toast.success('Login successful!');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await signIn(formData);
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -41,7 +38,7 @@ const Login = () => {
       });
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.message);
     }
   };
@@ -56,7 +53,7 @@ const Login = () => {
       }}>
         Login
       </h2>
-      <form onSubmit={handleLogin} style={{ 
+      <form onSubmit={handleSubmit} style={{ 
         display: 'flex', 
         flexDirection: 'column', 
         gap: '1rem',
@@ -64,31 +61,33 @@ const Login = () => {
       }}>
         <input
           type="email"
+          name="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={handleChange}
           style={glassmorphismStyles.input}
           required
-          disabled={loading}
+          disabled={isLoading}
         />
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formData.password}
+          onChange={handleChange}
           style={glassmorphismStyles.input}
           required
-          disabled={loading}
+          disabled={isLoading}
         />
         <button 
           type="submit" 
           style={{
             ...glassmorphismStyles.button,
-            opacity: loading ? 0.7 : 1,
+            opacity: isLoading ? 0.7 : 1,
           }}
-          disabled={loading}
+          disabled={isLoading}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {isLoading ? 'Logging in...' : 'Login'}
         </button>
         <button
           type="button"
@@ -100,9 +99,9 @@ const Login = () => {
             justifyContent: 'center',
             gap: '0.5rem',
             fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-            opacity: loading ? 0.7 : 1,
+            opacity: isLoading ? 0.7 : 1,
           }}
-          disabled={loading}
+          disabled={isLoading}
         >
           <FaFingerprint /> Login with Biometrics
         </button>

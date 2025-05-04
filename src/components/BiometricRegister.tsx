@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaFingerprint } from 'react-icons/fa';
-import { glassmorphismStyles } from '../styles/theme';
+import { glassmorphismStyles } from '../styles/theme.ts';
 
 const BiometricRegister = () => {
   const [isRegistering, setIsRegistering] = useState(false);

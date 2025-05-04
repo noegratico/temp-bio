@@ -9,7 +9,7 @@ export const glassmorphismStyles = {
     width: '100%',
     maxWidth: '400px',
     margin: '0 auto',
-    '@media (max-width: 480px)': {
+    '@media (maxWidth: 480px)': {
       padding: '1.5rem',
       margin: '1rem',
     },
@@ -26,7 +26,7 @@ export const glassmorphismStyles = {
       outline: 'none',
       borderColor: 'rgba(255, 255, 255, 0.4)',
     },
-    '@media (max-width: 480px)': {
+    '@media (maxWidth: 480px)': {
       padding: '0.6rem',
       fontSize: '0.9rem',
     },
@@ -44,7 +44,7 @@ export const glassmorphismStyles = {
     '&:hover': {
       background: 'rgba(255, 255, 255, 0.2)',
     },
-    '@media (max-width: 480px)': {
+    '@media (maxWidth: 480px)': {
       padding: '0.6rem 1.2rem',
       fontSize: '0.9rem',
     },
